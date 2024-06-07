@@ -1,0 +1,36 @@
+<li *ngFor="let checkboxNode of checkboxNodeMap | keyvalue">
+  <div class="checkbox-item">
+    <jmkw-checkbox
+      [id]="checkboxNode.key"
+      [selected]="checkboxNode.value.selected"
+      [indeterminate]="checkboxNode.value.indeterminate"
+      [title]="checkboxNode.value.title"
+      (selectChanged)="checkboxChangeHandler($event, checkboxNode)"
+    >
+      <span
+        inside
+        *ngIf="expandable && checkboxNode.value.children?.size"
+        class="expansion-toggle"
+      >
+        <i
+          class="icon-keyboard_arrow_right icon"
+          [ngClass]="{ expanded: checkboxNode.value.expanded }"
+          (click)="toggleExpandHandler($event, checkboxNode.key)"
+        >
+        </i>
+      </span>
+    </jmkw-checkbox>
+  </div>
+  <span
+    [ngClass]="{ expanded: !expandable || checkboxNode.value.expanded }"
+    *ngIf="checkboxNode.value.children?.size"
+    class="children-section"
+    ><ul>
+      <jmkw-checkboxes
+        [expandable]="expandable"
+        [checkboxNodeMap]="checkboxNode.value.children"
+        (checkboxChange)="onChildChange($event, checkboxNode.key)"
+      ></jmkw-checkboxes>
+    </ul>
+  </span>
+</li>
