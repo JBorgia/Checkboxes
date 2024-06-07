@@ -33,13 +33,6 @@ export class CheckboxMapNode extends BaseCheckboxNode {
     super(props);
     Object.assign(this, props);
   }
-
-  toCheckboxNode(): CheckboxNode {
-    return new CheckboxNode({
-      ...this,
-      children: checkboxExtMapToArray(this.children)
-    });
-  }
 }
 
 export class CheckboxNode extends BaseCheckboxNode {
@@ -49,26 +42,32 @@ export class CheckboxNode extends BaseCheckboxNode {
     super(props);
     Object.assign(this, props);
   }
-
-  toCheckboxMapNode(): CheckboxMapNode {
-    return new CheckboxMapNode({
-      ...this,
-      children: checkboxArrayToExtMap(this.children)
-    });
-  }
 }
 
 export function checkboxArrayToExtMap(
   nodes?: CheckboxNode[]
 ): ExtMap<CheckboxMapNode> {
   return new ExtMap<CheckboxMapNode>(
-    nodes?.map((node) => [
-      node.id,
-      new CheckboxMapNode({
-        ...node,
-        children: checkboxArrayToExtMap(node.children)
-      })
-    ])
+    nodes?.map((node) => {
+      // Align parent checkbox state to children
+      const indeterminate =
+        new Set(node.children?.map((child) => child.selected)).size === 2;
+
+      const selected =
+        node.children?.length && !indeterminate
+          ? node.children.every((child) => child.selected)
+          : node.selected;
+
+      return [
+        node.id,
+        new CheckboxMapNode({
+          ...node,
+          selected,
+          indeterminate,
+          children: checkboxArrayToExtMap(node.children)
+        })
+      ];
+    })
   );
 }
 
@@ -77,10 +76,22 @@ export function checkboxExtMapToArray(
 ): CheckboxNode[] {
   return [
     ...map
-      .map((key, value) => {
+      .map((key, node) => {
+        // Align parent checkbox state to children
+        const indeterminate =
+          new Set([...node.children.values()].map((child) => child.selected))
+            .size === 2;
+
+        const selected =
+          node.children.size && !indeterminate
+            ? [...node.children.values()].every((child) => child.selected)
+            : node.selected;
+
         return new CheckboxNode({
-          ...value,
-          children: checkboxExtMapToArray(value.children)
+          ...node,
+          selected,
+          indeterminate,
+          children: checkboxExtMapToArray(node.children)
         });
       })
       .values()
