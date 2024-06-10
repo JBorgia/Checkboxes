@@ -17,12 +17,12 @@ import {
 
 // Component decorator to define metadata for the CheckboxesComponent
 @Component({
-  selector: 'jmkw-checkboxes', // Selector to use this component in HTML
-  templateUrl: './checkboxes.component.html', // Path to the component's template file
-  standalone: true, // Indicates that this component can be used as a standalone component
-  imports: [CommonModule, CheckboxComponent], // List of modules to import
-  styleUrls: ['./checkboxes.component.scss'], // Path to the component's stylesheet
-  changeDetection: ChangeDetectionStrategy.OnPush // Change detection strategy to optimize performance
+  selector: 'jmkw-checkboxes',
+  templateUrl: './checkboxes.component.html',
+  standalone: true,
+  imports: [CommonModule, CheckboxComponent],
+  styleUrls: ['./checkboxes.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckboxesComponent {
   private _checkboxNodeMap!: ExtMap<CheckboxMapNode>; // Private property to hold the checkbox node map

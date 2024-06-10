@@ -50,12 +50,15 @@ export function checkboxArrayToExtMap(
   return new ExtMap<CheckboxMapNode>(
     nodes?.map((node) => {
       // Align parent checkbox state to children
+      const children = checkboxArrayToExtMap(node.children);
+
       const indeterminate =
-        new Set(node.children?.map((child) => child.selected)).size === 2;
+        new Set([...children.values()].map((child) => child.selected)).size ===
+        2;
 
       const selected =
         node.children?.length && !indeterminate
-          ? node.children.every((child) => child.selected)
+          ? [...children.values()].every((child) => child.selected)
           : node.selected;
 
       return [
@@ -64,7 +67,7 @@ export function checkboxArrayToExtMap(
           ...node,
           selected,
           indeterminate,
-          children: checkboxArrayToExtMap(node.children)
+          children
         })
       ];
     })
@@ -78,20 +81,21 @@ export function checkboxExtMapToArray(
     ...map
       .map((key, node) => {
         // Align parent checkbox state to children
+        const children = checkboxExtMapToArray(node.children);
+
         const indeterminate =
-          new Set([...node.children.values()].map((child) => child.selected))
-            .size === 2;
+          new Set(children.map((child) => child.selected)).size === 2;
 
         const selected =
-          node.children.size && !indeterminate
-            ? [...node.children.values()].every((child) => child.selected)
+          children.length && !indeterminate
+            ? children.every((child) => child.selected)
             : node.selected;
 
         return new CheckboxNode({
           ...node,
           selected,
           indeterminate,
-          children: checkboxExtMapToArray(node.children)
+          children
         });
       })
       .values()
